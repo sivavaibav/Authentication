@@ -42,9 +42,6 @@ router.get('/profile', verifyToken, async (req, res) => {
 // PUT /api/user/profile - Update authenticated user's profile
 router.put('/profile', verifyToken, async (req, res) => {
   try {
-    console.log('Update request received for userId:', req.userId);
-    console.log('Request body:', req.body);
-    
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
@@ -60,7 +57,14 @@ router.put('/profile', verifyToken, async (req, res) => {
     const profession = typeof req.body?.profession === 'string' ? req.body.profession.trim() : user.profession;
     const gender = typeof req.body?.gender === 'string' ? req.body.gender.trim() : user.gender;
     const website = typeof req.body?.website === 'string' ? req.body.website.trim() : user.website;
-    const dateOfBirth = req.body?.dateOfBirth ? new Date(req.body.dateOfBirth) : user.dateOfBirth;
+    let dateOfBirth = user.dateOfBirth;
+    
+    if (typeof req.body?.dateOfBirth === 'string' && req.body.dateOfBirth.trim()) {
+      const parsedDate = new Date(req.body.dateOfBirth);
+      if (!isNaN(parsedDate.getTime())) {
+        dateOfBirth = parsedDate;
+      }
+    }
 
     if (!name) {
       return res.status(400).json({ message: 'Name is required.' });
@@ -76,14 +80,9 @@ router.put('/profile', verifyToken, async (req, res) => {
     user.profession = profession;
     user.gender = gender;
     user.website = website;
-    if (dateOfBirth && !isNaN(dateOfBirth.getTime())) {
-      user.dateOfBirth = dateOfBirth;
-    }
+    user.dateOfBirth = dateOfBirth;
 
-    console.log('User object before save:', user.toObject());
     await user.save();
-    console.log('User saved successfully');
-
     return res.json(formatUserResponse(user));
   } catch (err) {
     // eslint-disable-next-line no-console

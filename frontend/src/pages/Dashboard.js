@@ -66,8 +66,16 @@ export default function Dashboard() {
       return;
     }
 
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      setError('Authentication token is missing. Please log in again.');
+      setTimeout(() => navigate('/login'), 2000);
+      return;
+    }
+
     setSaving(true);
     try {
+      console.log('Attempting to update profile with token:', token.substring(0, 20) + '...');
       const updated = await updateUserProfile({
         name: formData.name,
         phone: formData.phone,
@@ -80,6 +88,8 @@ export default function Dashboard() {
         gender: formData.gender,
         website: formData.website,
       });
+      
+      console.log('Profile update successful:', updated);
       setUser(updated);
       setFormData({
         name: updated.name || '',
@@ -98,6 +108,7 @@ export default function Dashboard() {
       setSuccess('✅ Profile updated successfully!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
+      console.error('Profile update error:', err);
       setError(err instanceof Error ? err.message : 'Failed to update profile.');
     } finally {
       setSaving(false);

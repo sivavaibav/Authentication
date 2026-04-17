@@ -4,12 +4,14 @@ async function jsonFetch(path, options) {
   const base = API_BASE_URL.replace(/\/+$/, '');
   const url = path.startsWith('http://') || path.startsWith('https://') ? path : `${base}${path}`;
 
+  const mergedHeaders = {
+    'Content-Type': 'application/json',
+    ...(options?.headers || {}),
+  };
+
   const res = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options?.headers || {}),
-    },
     ...options,
+    headers: mergedHeaders,
   });
 
   const data = await res.json().catch(() => ({}));
@@ -59,27 +61,30 @@ export async function updateUserProfile({
   gender, 
   website 
 }) {
+  // Only send dateOfBirth if it has a value
   const payload = { 
     name, 
-    phone, 
-    bio, 
-    address, 
-    city, 
-    country, 
-    profession, 
-    dateOfBirth, 
-    gender, 
-    website 
+    phone: phone || '', 
+    bio: bio || '', 
+    address: address || '', 
+    city: city || '', 
+    country: country || '', 
+    profession: profession || '', 
+    gender: gender || '', 
+    website: website || '', 
   };
-  console.log('Sending update payload:', payload);
   
+  // Only include dateOfBirth if it's not empty
+  if (dateOfBirth && dateOfBirth.trim()) {
+    payload.dateOfBirth = dateOfBirth;
+  }
+
   const result = await jsonFetch('/api/user/profile', {
     method: 'PUT',
     headers: getAuthHeader(),
     body: JSON.stringify(payload),
   });
-  
-  console.log('Received response from update:', result);
+
   return result;
 }
 

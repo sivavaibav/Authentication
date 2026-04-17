@@ -150,8 +150,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="home-container">
-      <div className="dashboard-card">
+    <>
+      <div className="dashboard-top-bar">
+        <h1>📊 My Dashboard</h1>
+        <button onClick={handleLogout} className="logout-btn-top">
+          🚪 Logout
+        </button>
+      </div>
+      <div className="home-container">
+        <div className="dashboard-card">
         <div className="dashboard-header">
           <div className="avatar-section">
             <img src={user.avatar} alt={user.name} className="avatar" />
@@ -378,6 +385,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -47,11 +47,39 @@ export async function getUserProfile() {
   });
 }
 
-export async function updateUserProfile({ name, phone, bio }) {
-  return jsonFetch('/api/user/profile', {
+export async function updateUserProfile({ 
+  name, 
+  phone, 
+  bio, 
+  address, 
+  city, 
+  country, 
+  profession, 
+  dateOfBirth, 
+  gender, 
+  website 
+}) {
+  const payload = { 
+    name, 
+    phone, 
+    bio, 
+    address, 
+    city, 
+    country, 
+    profession, 
+    dateOfBirth, 
+    gender, 
+    website 
+  };
+  console.log('Sending update payload:', payload);
+  
+  const result = await jsonFetch('/api/user/profile', {
     method: 'PUT',
     headers: getAuthHeader(),
-    body: JSON.stringify({ name, phone, bio }),
+    body: JSON.stringify(payload),
   });
+  
+  console.log('Received response from update:', result);
+  return result;
 }
 

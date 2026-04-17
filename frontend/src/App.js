@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import './styles/auth.css';
 
 import Login from './pages/Login';
@@ -33,16 +33,34 @@ function Home() {
   );
 }
 
+function Navigation() {
+  const location = useLocation();
+  let user = null;
+  try {
+    const raw = localStorage.getItem('authUser');
+    user = raw ? JSON.parse(raw) : null;
+  } catch {
+    user = null;
+  }
+
+  // Hide navbar on dashboard if user is authenticated
+  if (user && location.pathname === '/dashboard') {
+    return null;
+  }
+
+  return (
+    <nav className="nav-bar">
+      <Link to="/">🏠 Home</Link>
+      <Link to="/login">🔐 Login</Link>
+      <Link to="/register">📝 Register</Link>
+    </nav>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <nav className="nav-bar">
-        <Link to="/">🏠 Home</Link>
-        <Link to="/dashboard">📊 Dashboard</Link>
-        <Link to="/login">🔐 Login</Link>
-        <Link to="/register">📝 Register</Link>
-      </nav>
-
+      <Navigation />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />

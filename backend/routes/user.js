@@ -42,6 +42,9 @@ router.get('/profile', verifyToken, async (req, res) => {
 // PUT /api/user/profile - Update authenticated user's profile
 router.put('/profile', verifyToken, async (req, res) => {
   try {
+    console.log('Update request received for userId:', req.userId);
+    console.log('Request body:', req.body);
+    
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
@@ -77,13 +80,15 @@ router.put('/profile', verifyToken, async (req, res) => {
       user.dateOfBirth = dateOfBirth;
     }
 
+    console.log('User object before save:', user.toObject());
     await user.save();
+    console.log('User saved successfully');
 
     return res.json(formatUserResponse(user));
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(err);
-    return res.status(500).json({ message: 'Server error.' });
+    console.error('Error updating profile:', err);
+    return res.status(500).json({ message: 'Server error.', error: err.message });
   }
 });
 
